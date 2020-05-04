@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+//using System.Data.Entity;
 
 namespace EasySportEvent.Models
 {
@@ -19,6 +20,15 @@ namespace EasySportEvent.Models
         public ESEContext(DbContextOptions<ESEContext> options):base(options)
         {
             Database.EnsureCreated();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Region>()
+                        .HasOne(r => r.Sport)
+                        .WithMany(e => e.Regions)
+                        .HasForeignKey(s => s.SportId)
+                        .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

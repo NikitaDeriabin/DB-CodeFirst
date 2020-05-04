@@ -27,7 +27,10 @@ namespace EasySportEvent
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ESEContext>(options => options.UseSqlServer(connection));
+            services.AddControllers().AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddControllers();
+          
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

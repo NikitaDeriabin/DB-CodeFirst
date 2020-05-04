@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EasySportEvent.Models
 {
@@ -10,7 +11,7 @@ namespace EasySportEvent.Models
     {
         public int Id { get; set; }
 
-        [DateValidation(ErrorMessage = "Дiапазон дати вiд 2019 року до 2020 року")]
+        [DateValidationForEvents(ErrorMessage = "Дiапазон дати вiд 2019 року до 2022 року")]
         [DataType(DataType.DateTime)]
         [Display(Name = "Дата")]
         [Required(ErrorMessage = "Поле повинно бути заповненим")]
@@ -25,22 +26,34 @@ namespace EasySportEvent.Models
         [Display(Name = "Лiга")]
         public int? LeagueId { get; set; }
 
-        [Display(Name = "Команда")]
-        public int Team1Id { get; set; }
+        [Display(Name = "Команда1")]
+        //[ForeignKey("HomeTeam")]
+        public int? HomeTeamId { get; set; }
 
-        [Display(Name = "Команда")]
-        public int Team2Id { get; set; }
+        [Display(Name = "Команда2")]
+        //[ForeignKey("GuestTeam")]
+        public int? GuestTeamId { get; set; }
 
         [Display(Name = "Гравець")]
-        public int Person1Id { get; set; }
+        //[ForeignKey("HomePerson")]
+        public int? HomePersonId { get; set; }
 
         [Display(Name = "Гравець")]
-        public int Person2Id { get; set; }
+        //[ForeignKey("GuestPerson")]
+        public int? GuestPersonId { get; set; }
 
         public virtual League League { get; set; }
+        
+        [ForeignKey("HomeTeamId")]
         public virtual Team HomeTeam { get; set; }
+
+        [ForeignKey("GuestTeamId")]
         public virtual Team GuestTeam { get; set; }
+
+        [ForeignKey("HomePersonId")]
         public virtual Person HomePerson { get; set; }
+
+        [ForeignKey("GuestPersonId")]
         public virtual Person GuestPerson { get; set; }
     }
 }

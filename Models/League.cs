@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EasySportEvent.Models
 {
@@ -20,10 +21,9 @@ namespace EasySportEvent.Models
         [Required(ErrorMessage = "Поле повинно бути заповненим")]
         [Display(Name = "Назва")]
         [RegularExpression(@"^[A-Z]+[a-zA-Z""'\s-]*$", ErrorMessage = "Ви можете ввести тільки літери латиниці та пробіл. Перша буква повинна бути прописною")]
+        [Index(IsUnique = true)]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Поле повинно бути заповненим")]
-        [Range(1, 20, ErrorMessage = "Кількість має бути від 1 до 20")]
         [Display(Name = "Кількість")]
         public int EventAmount { get; set; }
 

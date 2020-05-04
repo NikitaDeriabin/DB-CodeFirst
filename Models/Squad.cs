@@ -7,10 +7,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EasySportEvent.Models
 {
+    [NotMapped]
     public class Squad
     {
-        [Key]
-        [ForeignKey("Team")]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Поле повинно бути заповненим")]

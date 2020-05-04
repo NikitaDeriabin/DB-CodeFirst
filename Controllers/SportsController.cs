@@ -42,8 +42,8 @@ namespace EasySportEvent.Controllers
         }
 
         // PUT: api/Sports/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSport(int id, Sport sport)
         {
@@ -74,8 +74,8 @@ namespace EasySportEvent.Controllers
         }
 
         // POST: api/Sports
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         public async Task<ActionResult<Sport>> PostSport(Sport sport)
         {
@@ -95,12 +95,23 @@ namespace EasySportEvent.Controllers
                 return NotFound();
             }
 
+            DeleteRegions(id);
+
             _context.Sports.Remove(sport);
             await _context.SaveChangesAsync();
 
             return sport;
         }
 
+        private void DeleteRegions(int id)
+        {
+            var regionsList = _context.Regions.Where(r => r.SportId == id).ToList();
+
+            foreach(var r in regionsList)
+            {
+                r.SportId = null;
+            }
+        }
         private bool SportExists(int id)
         {
             return _context.Sports.Any(e => e.Id == id);

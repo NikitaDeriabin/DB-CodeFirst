@@ -1,0 +1,281 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>EasySportEvent</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/site.css" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <h2 align="center" style="color:antiquewhite">Sports</h2>
+    </nav>
+
+    <form name="sportForm">
+        <div id="errors" class="alert alert-danger" style="display:none;"></div>
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group col-md-5">
+            <h3>Add sport</h3>
+            <input class="form-control" name="name" placeholder="name" />
+        </div>
+        <div class="panel-body">
+            <button type="submit" id="submit" class="btn btn-primary">Save</button>
+            <a id="reset" onclick="reset()" class="btn btn-primary">Reset</a>
+        </div>
+
+    </form>
+
+    <form name="sportFormEdit">
+        <input type="hidden" name="edit-id" />
+        <div class="form-group col-md-5">
+            <h3>Edit sport</h3>
+            <input class="form-control" name="edit-name" />
+        </div>
+        <div class="panel-body">
+            <button type="submit" id="edit-submit" class="btn btn-primary">Save</button>
+            <!--<a id="reset" onclick="reset()" class="btn btn-primary">Reset</a>-->
+        </div>
+    </form>
+
+    <div class="table">
+        <table class="table table-condensed table-striped  col-md-6">
+            <thead><tr><th>Name</th><th></th></tr></thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <script>
+        // Получение всех sport
+        async function GetSports() {
+            // отправляет запрос и получаем ответ
+            const response = await fetch("/api/sports", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            // если запрос прошел нормально
+            if (response.ok === true) {
+                // получаем данные
+                const sports = await response.json();
+                let rows = document.querySelector("tbody");
+                sports.forEach(sport => {
+                    // добавляем полученные элементы в таблицу
+                    rows.append(row(sport));
+                });
+            }
+        }
+
+        // Получение одного sport
+        async function GetSport(id) {
+            const response = await fetch("/api/sports/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const sport = await response.json();
+                const form = document.forms["sportFormEdit"];
+                form.elements["edit-id"].value = sport.id;
+                form.elements["edit-name"].value = sport.name;
+            }
+        }
+
+
+        // Добавление sport
+        async function CreateSport(sportName) {
+
+
+
+            const response = await fetch("api/sports", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: sportName
+                })
+            });
+
+            document.getElementById("errors").innerText = null;
+            document.getElementById("errors").style.display = "none";
+
+            if (response.ok === true) {
+                const sport = await response.json();
+                reset();
+                document.querySelector("tbody").append(row(sport));
+                document.getElementById("errors").innerText = null;
+                document.getElementById("errors").style.display = "none";
+            }
+            else {
+                const errorData = await response.json();
+                console.log("errors", errorData);
+                if (errorData) {
+                    // ошибки вследствие валидации по атрибутам
+                    if (errorData.errors) {
+                        if (errorData.errors["Name"]) {
+                            addError(errorData.errors["Name"]);
+                        }
+                    }
+                    // кастомные ошибки, определенные в контроллере
+                    // добавляем ошибки свойства Name
+                    if (errorData["Name"]) {
+                        addError(errorData["Name"]);
+                    }
+
+                }
+
+                document.getElementById("errors").style.display = "block";
+            }
+        }
+
+        // Изменение sport
+        async function EditSport(sportId, sportName) {
+
+            const response = await fetch("api/sports/" + sportId, {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: parseInt(sportId, 10),
+                    name: sportName
+                })
+            });
+
+            document.getElementById("errors").innerText = null;
+            document.getElementById("errors").style.display = "none";
+
+            if (response.ok === true) {
+                location.reload();
+                const sport = await response.json();
+                resetEdit();
+                document.querySelector("tr[data-rowid='" + sport.id + "']").replaceWith(row(sport));
+            }
+
+            else {
+                const errorData = await response.json();
+                console.log("errors", errorData);
+                if (errorData) {
+                    // ошибки вследствие валидации по атрибутам
+                    if (errorData.errors) {
+                        if (errorData.errors["Name"]) {
+                            addError(errorData.errors["Name"]);
+                        }
+                    }
+                    // кастомные ошибки, определенные в контроллере
+                    // добавляем ошибки свойства Name
+                    if (errorData["Name"]) {
+                        addError(errorData["Name"]);
+                    }
+
+                }
+
+                document.getElementById("errors").style.display = "block";
+            }
+        }
+
+        // Удаление sport
+        async function DeleteSport(id) {
+            const response = await fetch("/api/sports/" + id, {
+                method: "DELETE",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const sport = await response.json();
+                document.querySelector("tr[data-rowid='" + sport.id + "']").remove();
+            }
+        }
+
+        // сброс формы
+        function reset() {
+            const form = document.forms["sportForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        function addError(errors) {
+            errors.forEach(error => {
+                const p = document.createElement("p");
+                p.append(error);
+                document.getElementById("errors").append(p);
+            });
+        }
+
+        function resetEdit() {
+            location.href = "vk.com";
+            const form = document.forms["sportFormEdit"];
+            form.reset();
+            reset();
+        }
+
+        // создание строки для таблицы
+        function row(sport) {
+
+            const tr = document.createElement("tr");
+            tr.setAttribute("data-rowid", sport.id);
+
+
+
+            const nameTd = document.createElement("td");
+            nameTd.append(sport.name);
+            tr.append(nameTd);
+
+            const linksTd = document.createElement("td");
+
+            const editLink = document.createElement("a");
+            editLink.setAttribute("data-id", sport.id);
+            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            editLink.append("Edit");
+            editLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                GetSport(sport.id);
+            });
+            linksTd.append(editLink);
+
+            const removeLink = document.createElement("a");
+            removeLink.setAttribute("data-id", sport.id);
+            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            removeLink.append("Delete");
+            removeLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                DeleteSport(sport.id);
+            });
+
+            linksTd.append(removeLink);
+            tr.appendChild(linksTd);
+
+            return tr;
+        }
+
+        // сброс значений формы
+        document.getElementById("reset").click(function (e) {
+
+            e.preventDefault();
+            reset();
+        })
+
+        // отправка формы
+        document.forms["sportFormEdit"].addEventListener("submit", e => {
+            e.preventDefault();
+            
+            const form = document.forms["sportFormEdit"];
+            const id = form.elements["edit-id"].value;
+            const name = form.elements["edit-name"].value;
+            
+            EditSport(id, name);
+        });
+
+        document.forms["sportForm"].addEventListener("submit", e => {
+            e.preventDefault();
+            const form = document.forms["sportForm"];
+            const id = form.elements["id"].value;
+            const name = form.elements["name"].value;
+            CreateSport(name);
+        });
+
+        // загрузка пользователей
+        GetSports();
+    </script>
+
+</body>
+</html>

@@ -55,19 +55,17 @@ namespace EasySportEvent.Controllers
                 return BadRequest();
             }
 
-            try
-            {
-                @event = CheckResult(@event);
+            //try
+            //{
+            //    @event = CheckResult(@event);
 
-                CheckVersus(@event);
-
-                _context.Events.Add(@event);
-            }
-            catch(Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                throw;
-            }
+            //    CheckVersus(@event);
+            //}
+            //catch(Exception ex)
+            //{
+            //    ModelState.AddModelError(string.Empty, ex.Message);
+            //    throw;
+            //}
 
             _context.Entry(@event).State = EntityState.Modified;
 

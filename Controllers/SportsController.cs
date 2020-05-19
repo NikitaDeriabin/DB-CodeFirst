@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EasySportEvent.Models;
+using System.Text.RegularExpressions;
 
 namespace EasySportEvent.Controllers
 {
@@ -52,6 +53,19 @@ namespace EasySportEvent.Controllers
                 return BadRequest();
             }
 
+            string pattern = @"^[A-Z]+[a-zA-Z""'\s-]*$";
+            if (sport.Name.Length < 3 || sport.Name.Length > 21)
+            {
+                ModelState.AddModelError("Name", "Довжина має бути від 3 до 20 символів");
+            }
+            if (!Regex.IsMatch(sport.Name, pattern))
+            {
+                ModelState.AddModelError("Name", "Ви можете ввести тільки літери латиниці та пробіл. Перша буква повинна бути прописною");
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             _context.Entry(sport).State = EntityState.Modified;
 
             try
@@ -79,6 +93,19 @@ namespace EasySportEvent.Controllers
         [HttpPost]
         public async Task<ActionResult<Sport>> PostSport(Sport sport)
         {
+            string pattern = @"^[A-Z]+[a-zA-Z""'\s-]*$";
+            if (sport.Name.Length < 3 || sport.Name.Length > 21)
+            {
+                ModelState.AddModelError("Name", "Довжина має бути від 3 до 20 символів");
+            }
+            if(!Regex.IsMatch(sport.Name, pattern))
+            {
+                ModelState.AddModelError("Name", "Ви можете ввести тільки літери латиниці та пробіл. Перша буква повинна бути прописною");
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             _context.Sports.Add(sport);
             await _context.SaveChangesAsync();
 

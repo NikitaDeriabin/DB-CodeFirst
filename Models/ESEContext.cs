@@ -24,11 +24,6 @@ namespace EasySportEvent.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Region>()
-                        .HasOne(r => r.Sport)
-                        .WithMany(e => e.Regions)
-                        .HasForeignKey(s => s.SportId)
-                        .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

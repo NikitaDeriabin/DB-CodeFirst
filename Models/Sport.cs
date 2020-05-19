@@ -18,7 +18,7 @@ namespace EasySportEvent.Models
 
         [Required(ErrorMessage ="Поле повинно бути заповненим")]
         [Display(Name = "Назва")]
-        [RegularExpression(@"^[A-Z]+[a-zA-Z""'\s-]*$", ErrorMessage = "Ви можете ввести тільки літери латиниці та пробіл. Перша буква повинна бути прописною")]
+        //[RegularExpression(@"^[A-Z]+[a-zA-Z""'\s-]*$", ErrorMessage = "Ви можете ввести тільки літери латиниці та пробіл. Перша буква повинна бути прописною")]
         [Index(IsUnique = true)]
         public string Name { get; set; }
 
